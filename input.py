@@ -1,4 +1,5 @@
 from freenect import sync_get_depth as get_depth, sync_get_video as get_video
+from itertools import chain
 import numpy as np
 import cv
 import time
@@ -31,15 +32,17 @@ class Finder:
         duration = 1000.0 / fps # duration of each frame in ms
 
         while(True):
-            
+
             # Get a fresh frame
             (depth,_) = get_depth()
 
             start = time.time()
 
             # loop over each color
-            server.sendMessage(json.dumps(depth.tolist()))
+            flatlist = list(chain.from_iterable(depth.tolist()))
+            server.sendMessage(json.dumps(flatlist))
 
+            time.sleep(1) # seconds
 
             end = time.time()
 
