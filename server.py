@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
 import signal, sys, ssl, logging, time, os
 from input import Finder
 
@@ -18,15 +21,9 @@ class InputServer(WebSocket):
         if self.data is None:
             self.data = ''
         try:
-            self.sendMessage(str(self.data))
+            self.sendMessage(self.data)
         except Exception as n:
             print(n)
-
-    def start_finder(self):
-        opts = {
-            'debug'  : debug
-        }
-        Finder().init(self, opts)
 
     def handleConnected(self):
         print(self.address, 'connected')
@@ -36,6 +33,7 @@ class InputServer(WebSocket):
         print(self.address, 'closed')
 
 if __name__ == "__main__":
+
     def close_sig_handler(signal, frame):
         server.close()
         sys.exit()
