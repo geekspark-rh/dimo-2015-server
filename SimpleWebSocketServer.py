@@ -313,8 +313,6 @@ class WebSocket(object):
 
          if length > 0:
             self.sendBuffer(header + s) 
-            print header
-            print s
          else:
             self.sendBuffer(header)
          header = None

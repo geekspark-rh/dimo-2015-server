@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import signal, sys, ssl, logging, time, os
-from input import Finder
+import input
 
 import thread
 import getopt
@@ -18,16 +18,12 @@ debug=False
 
 class InputServer(WebSocket):
     def handleMessage(self):
-        if self.data is None:
-            self.data = ''
-        try:
-            self.sendMessage(self.data)
-        except Exception as n:
-            print(n)
+        pass
 
     def handleConnected(self):
         print(self.address, 'connected')
-        thread.start_new_thread(self.start_finder, ())
+        input.startloop(self)
+        # thread.start_new_thread(self.start_finder, ())
 
     def handleClose(self):
         print(self.address, 'closed')
