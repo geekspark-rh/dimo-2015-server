@@ -1,48 +1,51 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
-import signal, sys, ssl, logging, time, os
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import input
+import logging
+import signal
+import sys
 
-import thread
-import getopt
+from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer
 
-sys.path.append(os.path.abspath(os.path.curdir + '/vendor/SimpleWebSocketServer'))
-from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer, SimpleSSLWebSocketServer
 
-#logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.ERROR)
+def get_args():
+    parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 
-cam=1
-debug=False
+    parser.add_argument('-d', '--debug', action='store_true', help='Turn on debug mode')
 
-class InputServer(WebSocket):
-    def handleMessage(self):
-        pass
+    return parser.parse_args()
 
-    def handleConnected(self):
-        print(self.address, 'connected')
-        input.startloop(self)
-        # thread.start_new_thread(self.start_finder, ())
 
-    def handleClose(self):
-        print(self.address, 'closed')
+def serve():
 
-if __name__ == "__main__":
+    class InputServer(WebSocket):
+        def __init__(self, *args, **kwargs):
+            super(InputServer, self).__init__(*args, **kwargs)
+            self.runloop = None
 
-    def close_sig_handler(signal, frame):
+        def handleConnected(self):
+            print(self.address, 'connected')
+            self.runloop = input.KinectLoop(self)
+            self.runloop.start()
+
+        def handleClose(self):
+            self.runloop.kill()
+            print(self.address, 'closed')
+
+
+    def close_sig_handler(signum, frame):
         server.close()
         sys.exit()
-
-
-    opts, args = getopt.getopt(sys.argv[1:], 'c:')
-    for o, a in opts:
-        if o == 'c':
-            cam=0
-        elif o == 'd':
-            debug=True
 
     signal.signal(signal.SIGINT, close_sig_handler)
     server = SimpleWebSocketServer('0.0.0.0', 1337, InputServer)
     server.serveforever()
 
+
+def main():
+    args = get_args()
+    loglevel = logging.DEBUG if args.debug else logging.WARNING
+    logging.basicConfig(level=loglevel, format='%(levelname)s|%(asctime)s|%(module)s|%(funcName)s:  %(message)s')
+    serve()
+
+if __name__ == "__main__":
+    main()

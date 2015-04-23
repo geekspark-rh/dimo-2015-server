@@ -1,6 +1,24 @@
-import sys
 import freenect
-import time
+from threading import Thread
+
+
+class KinectLoop(Thread):
+
+    def __init__(self, server, **kwargs):
+        super(KinectLoop, self).__init__(**kwargs)
+        self.server = server
+        self.killfreenect = False
+
+    def body(self, dev, ctx):
+        if self.killfreenect:
+            raise freenect.Kill
+
+    def kill(self):
+        self.killfreenect = True
+
+    def run(self):
+        freenect.runloop(body=self.body, depth=createdepthhandler(self.server))
+
 
 def createdepthhandler(server):
     def handledepth(dev, depth, timestamp):
@@ -12,8 +30,8 @@ def createdepthhandler(server):
 
     return handledepth
 
+
 def startloop(server):
     freenect.runloop(
         depth=createdepthhandler(server)
     )
-
