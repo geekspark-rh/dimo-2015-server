@@ -11,7 +11,7 @@ class KinectLoop(Thread):
 
     def body(self, dev, ctx):
         if self.killfreenect:
-            raise freenect.Kill
+            raise freenect.Kill("Killing freenect runloop")
 
     def kill(self):
         self.killfreenect = True
