@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import input
 import logging
