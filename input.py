@@ -1,6 +1,7 @@
 import freenect
 from threading import Thread
 
+last_tilt = 0
 
 class KinectLoop(Thread):
 
@@ -10,8 +11,14 @@ class KinectLoop(Thread):
         self.killfreenect = False
 
     def body(self, dev, ctx):
+        global last_tilt
         if self.killfreenect:
             raise freenect.Kill("Killing freenect runloop")
+        if (self.server.tilt is None or self.server.tilt == last_tilt):
+            return
+        else:
+            freenect.set_tilt_degs(dev, self.server.tilt)
+            last_tilt = self.server.tilt
 
     def kill(self):
         self.killfreenect = True

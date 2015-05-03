@@ -21,6 +21,7 @@ def get_args():
 def serve():
 
     class InputServer(WebSocket):
+        tilt = 0
         def __init__(self, *args, **kwargs):
             super(InputServer, self).__init__(*args, **kwargs)
             self.runloop = None
@@ -33,6 +34,9 @@ def serve():
         def handleClose(self):
             self.runloop.kill()
             print(self.address, 'closed')
+
+        def handleMessage(self):
+            self.tilt = int(float(self.data))
 
 
     def close_sig_handler(signum, frame):
