@@ -1,4 +1,3 @@
-dimo-input
-==========
+The DiMo 2015 project has grown up!  It's now a standalone project and has moved to its own repository.
 
-Find players, send info to the connected renderer... simple eh
+Check out [Kimotion](https://github.com/mwcz/Kimotion)!
